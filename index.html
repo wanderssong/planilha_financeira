@@ -5,8 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Planilha Online – Ganhos & Gastos</title>
-
-  <!-- ====== Estilos (mantive seu tema e ajustei mobile) ====== -->
   <style>
     :root {
       --bg: #0f172a;
@@ -280,7 +278,6 @@
       background: linear-gradient(180deg, transparent, rgba(2, 6, 23, .8))
     }
 
-    /* MOBILE: alvos de toque maiores e fixos */
     .toolbar-mobile {
       position: sticky;
       bottom: 0;
@@ -297,7 +294,6 @@
       flex: 1
     }
 
-    /* Scroll da tabela mais confortável no celular */
     .table-scroll {
       overflow: auto;
       max-height: 60vh;
@@ -306,7 +302,6 @@
       -webkit-overflow-scrolling: touch
     }
 
-    /* Botões de linha maiores no mobile */
     @media (max-width:540px) {
       .actions .btn {
         padding: 10px 12px;
@@ -436,7 +431,7 @@
             </datalist>
           </div>
           <div class="sticky-bottom toolbar-mobile">
-            <button class="btn primary" type="submit">Adicionar</button>
+            <button id="btn-add" class="btn primary" type="submit">Adicionar</button>
             <button class="btn ghost" type="button" id="btn-import-ui">Importar</button>
             <input id="import-file" type="file" accept="application/json" style="display:none;">
           </div>
@@ -473,15 +468,16 @@
     </main>
   </section>
 
-  <!-- ====== Firebase (v11 módulos) ====== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc,
-      onSnapshot, query, where
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  <!-- Firebase compat (garante funcionamento amplo em mobile e file://) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-    // ==== SUA CONFIG DO FIREBASE (como você mandou) ====
+  <!-- jsPDF + autoTable -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+  <script>
+    // ==== CONFIG FIREBASE (a sua) ====
     const firebaseConfig = {
       apiKey: "AIzaSyBoUUf8oBSL-5z7xEfPDPoMZcs10YYpyxc",
       authDomain: "planilha-financeira-1c4cc.firebaseapp.com",
@@ -490,8 +486,13 @@
       messagingSenderId: "101170904419",
       appId: "1:101170904419:web:167e1451a082486eeb2756"
     };
-    const appFB = initializeApp(firebaseConfig);
-    const db = getFirestore(appFB);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // (Opcional) Persistência offline
+    if (db.enablePersistence) {
+      db.enablePersistence().catch(() => { });
+    }
 
     // ====== Estado / Utils ======
     const SESSION_KEY = 'wg_financas_session';
@@ -505,13 +506,12 @@
     }
     function escapeHtml(s) { return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
 
-    let currentUser = null;          // 'wandersson' | 'gislaine'
-    let data = [];                   // cache em memória (do Firestore)
-    let unsubscribe = null;          // listener do Firestore
+    let currentUser = null;
+    let data = [];
+    let unsubscribe = null;
 
     // ====== Login ======
     const allowed = { wandersson: '2025', gislaine: '2025' };
-
     const loginView = document.getElementById('login-view');
     const appView = document.getElementById('app');
     const loginForm = document.getElementById('login-form');
@@ -524,7 +524,7 @@
       applyFilter();
     }
 
-    // restaura sessão
+    // sessão
     const previous = sessionStorage.getItem(SESSION_KEY);
     if (previous) {
       currentUser = previous;
@@ -558,20 +558,21 @@
       if (!currentUser) return;
       if (unsubscribe) unsubscribe();
 
-      const qUser = query(collection(db, 'transacoes'), where('user', '==', currentUser));
-      unsubscribe = onSnapshot(qUser, (snap) => {
-        const arr = [];
-        snap.forEach(d => {
-          const v = d.data();
-          arr.push({ id: d.id, ...v });
+      unsubscribe = db.collection('transacoes')
+        .where('user', '==', currentUser)
+        .onSnapshot((snap) => {
+          const arr = [];
+          snap.forEach(d => {
+            const v = d.data();
+            arr.push({ id: d.id, ...v });
+          });
+          data = arr.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+          populateMonthYearSelectors();
+          applyFilter();
+        }, (err) => {
+          console.error('Firestore listener error:', err);
+          alert('Erro ao conectar ao banco de dados.');
         });
-        // Ordena por data crescente (client-side)
-        data = arr.sort((a, b) => String(a.date).localeCompare(String(b.date)));
-        populateMonthYearSelectors(); // anos podem mudar conforme dados
-        applyFilter();
-      }, (err) => {
-        console.error('Firestore listener error:', err);
-      });
     }
 
     // ====== Filtros ======
@@ -608,6 +609,7 @@
     // ====== Form Lançamento ======
     const form = document.getElementById('form');
     const tbody = document.getElementById('tbody');
+    const addBtn = document.getElementById('btn-add');
 
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);
     const amountInput = document.getElementById('amount');
@@ -618,7 +620,7 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser) return alert('Você precisa estar logado.');
+      if (!currentUser) { alert('Você precisa estar logado.'); return; }
 
       const type = document.getElementById('type').value;
       const date = document.getElementById('date').value;
@@ -626,19 +628,27 @@
       const desc = document.getElementById('desc').value.trim();
       const category = document.getElementById('category').value.trim();
 
-      if (!date) return alert('Informe a data');
+      if (!date) { alert('Informe a data'); return; }
       const amount = parseBRL(amountRaw);
-      if (isNaN(amount)) return alert('Valor inválido');
+      if (isNaN(amount)) { alert('Valor inválido'); return; }
+
+      // feedback para evitar "não clicou"
+      addBtn.disabled = true;
+      addBtn.textContent = 'Salvando...';
 
       try {
-        await addDoc(collection(db, 'transacoes'), {
+        await db.collection('transacoes').add({
           user: currentUser, type, date, amount, desc, category, createdAt: Date.now()
         });
         form.reset();
         document.getElementById('type').value = type;
         document.getElementById('date').value = new Date().toISOString().slice(0, 10);
       } catch (err) {
-        console.error(err); alert('Falha ao salvar no Firebase.');
+        console.error(err);
+        alert('Falha ao salvar no Firebase. Verifique as Regras do Firestore.');
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = 'Adicionar';
       }
     });
 
@@ -646,12 +656,10 @@
     function applyFilter() {
       const m = Number(monthSel.value);
       const y = Number(yearSel.value);
-
       const filtered = data.filter(x => {
         const d = new Date(String(x.date) + 'T00:00:00');
         return (d.getMonth() + 1) === m && d.getFullYear() === y;
       });
-
       renderTable(filtered);
       renderSummary(filtered);
     }
@@ -694,7 +702,7 @@
       }).join('');
     }
 
-    // Ações linha (Editar/Duplicar/Excluir)
+    // Ações de linha
     tbody.addEventListener('click', async (e) => {
       const btn = e.target.closest('button'); if (!btn) return;
       const tr = e.target.closest('tr'); const id = tr?.dataset?.id;
@@ -702,12 +710,13 @@
 
       if (btn.dataset.action === 'del') {
         if (confirm('Excluir lançamento?')) {
-          try { await deleteDoc(doc(db, 'transacoes', id)); } catch (err) { console.error(err); alert('Erro ao excluir.'); }
+          try { await db.collection('transacoes').doc(id).delete(); }
+          catch (err) { console.error(err); alert('Erro ao excluir.'); }
         }
       }
       if (btn.dataset.action === 'dup') {
         try {
-          await addDoc(collection(db, 'transacoes'), {
+          await db.collection('transacoes').add({
             user: currentUser, type: item.type, date: item.date, amount: item.amount,
             desc: item.desc, category: item.category, createdAt: Date.now()
           });
@@ -722,7 +731,7 @@
         const num = parseBRL(novoval);
         if (isNaN(num)) return alert('Valor inválido');
         try {
-          await updateDoc(doc(db, 'transacoes', id), { date: novadata, type: novotipo, desc: novadesc, category: novacat, amount: num });
+          await db.collection('transacoes').doc(id).update({ date: novadata, type: novotipo, desc: novadesc, category: novacat, amount: num });
         } catch (err) { console.error(err); alert('Erro ao editar.'); }
       }
     });
@@ -749,7 +758,7 @@
         if (!Array.isArray(json)) throw new Error('Arquivo inválido');
         const batch = json.filter(x => x && typeof x === 'object' && x.date && x.type && typeof x.amount === 'number');
         for (const x of batch) {
-          await addDoc(collection(db, 'transacoes'), {
+          await db.collection('transacoes').add({
             user: currentUser, type: x.type, date: x.date, amount: x.amount, desc: x.desc || '', category: x.category || '', createdAt: Date.now()
           });
         }
@@ -760,11 +769,10 @@
       }
     });
 
-    // ====== PDF (Resumo + Tabela Completa do mês filtrado) ======
-    // jsPDF + autoTable via UMD
-    // (carregados no script não-módulo abaixo; aqui só usamos)
+    // ====== PDF (Resumo + Tabela Completa) ======
     document.getElementById('btn-pdf').addEventListener('click', () => {
-      const m = Number(monthSel.value), y = Number(yearSel.value);
+      const m = Number(document.getElementById('filter-month').value);
+      const y = Number(document.getElementById('filter-year').value);
       const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       const header = `Relatório Financeiro - ${monthNames[m - 1]}/${y} • Usuário: ${currentUser}`;
 
@@ -777,7 +785,6 @@
       const expenses = filtered.filter(x => x.type === 'expense').reduce((s, x) => s + x.amount, 0);
       const balance = incomes - expenses;
 
-      // @ts-ignore
       const { jsPDF } = window.jspdf;
       const docPDF = new jsPDF({ unit: 'pt', format: 'a4' });
 
@@ -793,32 +800,26 @@
         return [dia, x.type === 'income' ? 'Ganho' : 'Gasto', x.desc || '', x.category || '', brl(x.amount)];
       });
 
-      // @ts-ignore
       docPDF.autoTable({
         head: [['Data', 'Tipo', 'Descrição', 'Categoria', 'Valor']],
         body: rows,
         startY: 80,
         styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [22, 163, 74] } // verde
+        headStyles: { fillColor: [22, 163, 74] }
       });
 
       docPDF.save(`relatorio-${currentUser}-${y}-${String(m).padStart(2, '0')}.pdf`);
     });
 
-    // ====== Inicializações qualitativas ======
-    // Enter navega campos
+    // ====== UX extra ======
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
-        const inputs = Array.from(form.querySelectorAll('input, select'));
+        const inputs = Array.from(document.getElementById('form').querySelectorAll('input, select'));
         const i = inputs.indexOf(e.target);
         if (i > -1 && i < inputs.length - 1) { e.preventDefault(); inputs[i + 1].focus(); }
       }
     });
   </script>
-
-  <!-- jsPDF + autoTable (UMD, não-módulo) -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 </body>
 
 </html>
