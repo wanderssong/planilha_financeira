@@ -3,141 +3,133 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Planilha Online – Ganhos & Gastos</title>
+
+  <!-- ====== Estilos (mantive seu tema e ajustei mobile) ====== -->
   <style>
     :root {
       --bg: #0f172a;
-      /* slate-900 */
       --panel: #111827;
-      /* gray-900 */
       --muted: #1f2937;
-      /* gray-800 */
       --text: #e5e7eb;
-      /* gray-200 */
       --text-dim: #9ca3af;
-      /* gray-400 */
       --primary: #22c55e;
-      /* green-500 */
       --danger: #ef4444;
-      /* red-500 */
       --warning: #f59e0b;
-      /* amber-500 */
       --accent: #38bdf8;
-      /* sky-400 */
       --radius: 16px;
-      --shadow: 0 10px 25px rgba(0, 0, 0, .35);
+      --shadow: 0 10px 25px rgba(0, 0, 0, .35)
     }
 
     * {
-      box-sizing: border-box;
+      box-sizing: border-box
     }
 
     html,
     body {
-      height: 100%;
+      height: 100%
     }
 
     body {
       margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
       background: linear-gradient(180deg, #0b1220, #0f172a 40% 100%);
-      color: var(--text);
+      color: var(--text)
     }
 
-    /* ---------- Utilidades ---------- */
     .container {
       width: 100%;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 20px
     }
 
     .card {
       background: var(--panel);
       border: 1px solid #1f2937;
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow)
     }
 
     .card.pad {
-      padding: 16px;
+      padding: 16px
     }
 
     .row {
       display: grid;
-      gap: 12px;
+      gap: 12px
     }
 
-    @media (min-width: 768px) {
+    @media (min-width:768px) {
       .row.cols-2 {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr
       }
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width:1024px) {
       .row.cols-3 {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr
       }
     }
 
     .btn {
       appearance: none;
       border: none;
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-weight: 600;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-weight: 700;
       cursor: pointer;
       background: var(--muted);
       color: var(--text);
       transition: transform .04s ease, opacity .2s ease, filter .2s ease;
+      font-size: 15px
     }
 
     .btn:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.1)
     }
 
     .btn:active {
-      transform: translateY(1px);
+      transform: translateY(1px)
     }
 
     .btn.primary {
       background: linear-gradient(135deg, #16a34a, #22c55e);
-      color: #062a12;
+      color: #062a12
     }
 
     .btn.warn {
       background: #1f2937;
-      border: 1px solid var(--warning);
-      color: var(--text);
+      border: 1px solid var(--warning)
     }
 
     .btn.danger {
       background: #1f2937;
-      border: 1px solid var(--danger);
-      color: var(--text);
+      border: 1px solid var(--danger)
     }
 
     .btn.ghost {
       background: transparent;
-      border: 1px solid #334155;
+      border: 1px solid #334155
     }
 
     .input,
     select {
       width: 100%;
-      padding: 12px 14px;
+      padding: 14px;
       border-radius: 12px;
       background: #0b1220;
       color: var(--text);
       border: 1px solid #233047;
       outline: none;
+      font-size: 16px
     }
 
     .input:focus,
     select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, .15);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, .15)
     }
 
     label {
@@ -146,7 +138,7 @@
       letter-spacing: .08em;
       color: var(--text-dim);
       display: block;
-      margin: 10px 0 6px;
+      margin: 10px 0 6px
     }
 
     .badge {
@@ -156,19 +148,19 @@
       font-weight: 700;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 6px
     }
 
     .badge.income {
       background: rgba(34, 197, 94, .15);
       color: #86efac;
-      border: 1px solid rgba(34, 197, 94, .3);
+      border: 1px solid rgba(34, 197, 94, .3)
     }
 
     .badge.expense {
       background: rgba(239, 68, 68, .15);
       color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, .3);
+      border: 1px solid rgba(239, 68, 68, .3)
     }
 
     header.appbar {
@@ -177,7 +169,7 @@
       z-index: 20;
       backdrop-filter: blur(8px);
       background: rgba(2, 6, 23, .65);
-      border-bottom: 1px solid #1f2937;
+      border-bottom: 1px solid #1f2937
     }
 
     .appbar-inner {
@@ -185,14 +177,14 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 10px 16px;
+      padding: 10px 16px
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 800;
+      font-weight: 800
     }
 
     .brand .logo {
@@ -200,18 +192,14 @@
       height: 36px;
       border-radius: 10px;
       background: linear-gradient(135deg, #06b6d4, #22d3ee 60%, #0ea5e9);
-      box-shadow: inset 0 0 15px rgba(255, 255, 255, .15), 0 8px 20px rgba(14, 165, 233, .25);
-    }
-
-    .brand span {
-      letter-spacing: .02em;
+      box-shadow: inset 0 0 15px rgba(255, 255, 255, .15), 0 8px 20px rgba(14, 165, 233, .25)
     }
 
     .stat {
-      padding: 14px;
+      padding: 16px;
       border-radius: 12px;
       background: #0b1220;
-      border: 1px solid #1f2937;
+      border: 1px solid #1f2937
     }
 
     .stat h3 {
@@ -219,18 +207,18 @@
       font-size: 12px;
       color: var(--text-dim);
       letter-spacing: .08em;
-      text-transform: uppercase;
+      text-transform: uppercase
     }
 
     .stat p {
       margin: 0;
-      font-size: 20px;
-      font-weight: 800;
+      font-size: 22px;
+      font-weight: 800
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: collapse
     }
 
     thead th {
@@ -243,54 +231,91 @@
       font-size: 12px;
       letter-spacing: .08em;
       text-transform: uppercase;
-      border-bottom: 1px solid #233047;
+      border-bottom: 1px solid #233047
     }
 
     tbody td {
       padding: 12px;
       border-bottom: 1px solid #1f2937;
-      vertical-align: middle;
+      vertical-align: middle
     }
 
     tbody tr:hover {
-      background: rgba(56, 189, 248, .05);
+      background: rgba(56, 189, 248, .05)
     }
 
     .actions {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap
     }
 
     .footer {
       color: var(--text-dim);
       font-size: 12px;
       text-align: center;
-      margin: 24px 0 12px;
+      margin: 24px 0 12px
     }
 
-    /* Login */
     .login-wrap {
       display: grid;
       min-height: 100dvh;
       place-items: center;
-      padding: 24px;
+      padding: 24px
     }
 
     .login {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px
     }
 
     .login h1 {
-      margin: 0 0 14px;
+      margin: 0 0 14px
     }
 
-    /* Mobile helpers */
     .sticky-bottom {
       position: sticky;
       bottom: 0;
       padding-top: 12px;
-      background: linear-gradient(180deg, transparent, rgba(2, 6, 23, .8));
+      background: linear-gradient(180deg, transparent, rgba(2, 6, 23, .8))
+    }
+
+    /* MOBILE: alvos de toque maiores e fixos */
+    .toolbar-mobile {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      gap: 8px;
+      background: rgba(2, 6, 23, .7);
+      backdrop-filter: blur(6px);
+      padding: 10px;
+      border-top: 1px solid #1f2937;
+      border-radius: 12px
+    }
+
+    .toolbar-mobile .btn {
+      flex: 1
+    }
+
+    /* Scroll da tabela mais confortável no celular */
+    .table-scroll {
+      overflow: auto;
+      max-height: 60vh;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      -webkit-overflow-scrolling: touch
+    }
+
+    /* Botões de linha maiores no mobile */
+    @media (max-width:540px) {
+      .actions .btn {
+        padding: 10px 12px;
+        font-size: 14px
+      }
+
+      .stat p {
+        font-size: 20px
+      }
     }
   </style>
 </head>
@@ -305,7 +330,10 @@
         </div>
         <h1>Entrar na Planilha</h1>
       </div>
-      <p style="margin-top:-6px;color:var(--text-dim)">Use seu usuário e senha para acessar.</p>
+      <p style="margin-top:-6px;color:var(--text-dim)">
+        Use seu usuário e senha para acessar. <br>
+        <small>Dica: <code>wandersson</code> / <code>Ano</code> ou <code>Gislaine</code> / <code>Ano</code></small>
+      </p>
       <form id="login-form">
         <label for="user">Usuário</label>
         <input class="input" id="user" autocomplete="username" placeholder="Usuario" required>
@@ -313,7 +341,7 @@
         <input class="input" id="pass" type="password" autocomplete="current-password" placeholder="••••" required>
         <div style="display:flex;gap:8px;margin-top:14px;align-items:center;justify-content:space-between;">
           <button class="btn primary" type="submit">Entrar</button>
-          <small style="color:var(--text-dim)">Dica: <code>wandersson</code> / <code>Ano</code></small>
+          <small id="login-msg" style="color:#fca5a5;visibility:hidden;">Usuário ou senha inválidos.</small>
         </div>
       </form>
     </div>
@@ -327,8 +355,9 @@
           <div class="logo"></div>
           <span>Planilha de Ganhos & Gastos</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button id="btn-export" class="btn ghost" title="Exportar JSON">Exportar</button>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button id="btn-export" class="btn ghost" title="Exportar JSON">Exportar JSON</button>
+          <button id="btn-pdf" class="btn ghost" title="Gerar PDF">Relatório PDF</button>
           <button id="btn-logout" class="btn danger">Sair</button>
         </div>
       </div>
@@ -406,22 +435,24 @@
               <option>Outros</option>
             </datalist>
           </div>
-          <div class="sticky-bottom">
-            <button class="btn primary" type="submit" style="width:100%;">Adicionar Lançamento</button>
+          <div class="sticky-bottom toolbar-mobile">
+            <button class="btn primary" type="submit">Adicionar</button>
+            <button class="btn ghost" type="button" id="btn-import-ui">Importar</button>
+            <input id="import-file" type="file" accept="application/json" style="display:none;">
           </div>
         </form>
       </div>
 
       <!-- Tabela -->
       <div class="card pad">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;">
+        <div
+          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;">
           <h2 style="margin:0;">Lançamentos</h2>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="btn-import" class="btn ghost" type="button" title="Importar JSON">Importar</button>
-            <input id="import-file" type="file" accept="application/json" style="display:none;">
           </div>
         </div>
-        <div style="overflow:auto; max-height: 55vh; border: 1px solid #1f2937; border-radius: 12px;">
+        <div class="table-scroll">
           <table>
             <thead>
               <tr>
@@ -430,7 +461,7 @@
                 <th>Descrição</th>
                 <th>Categoria</th>
                 <th>Valor</th>
-                <th style="width:110px;">Ações</th>
+                <th style="width:150px;">Ações</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -438,30 +469,53 @@
         </div>
       </div>
 
-      <p class="footer">Dados salvos no seu navegador (localStorage). Exporte para fazer backup.</p>
+      <p class="footer">Dados salvos no Firebase por usuário. Exporte para backup.</p>
     </main>
   </section>
 
-  <script>
-    // ====== Storage Helpers ======
-    const STORAGE_KEY = 'wg_financas_transacoes_v1';
-    const SESSION_KEY = 'wg_financas_session';
+  <!-- ====== Firebase (v11 módulos) ====== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc,
+      onSnapshot, query, where
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+    // ==== SUA CONFIG DO FIREBASE (como você mandou) ====
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoUUf8oBSL-5z7xEfPDPoMZcs10YYpyxc",
+      authDomain: "planilha-financeira-1c4cc.firebaseapp.com",
+      projectId: "planilha-financeira-1c4cc",
+      storageBucket: "planilha-financeira-1c4cc.firebasestorage.app",
+      messagingSenderId: "101170904419",
+      appId: "1:101170904419:web:167e1451a082486eeb2756"
+    };
+    const appFB = initializeApp(firebaseConfig);
+    const db = getFirestore(appFB);
+
+    // ====== Estado / Utils ======
+    const SESSION_KEY = 'wg_financas_session';
     const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
     const pad = (n) => String(n).padStart(2, '0');
-
-    function load() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-      catch { return []; }
+    const brl = (n) => fmt.format(n || 0);
+    function parseBRL(str) {
+      if (!str) return NaN;
+      const s = String(str).replace(/\./g, '').replace(',', '.').replace(/[^0-9.-]/g, '');
+      return Number(s);
     }
-    function save(list) { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+    function escapeHtml(s) { return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
 
-    let data = load();
+    let currentUser = null;          // 'wandersson' | 'gislaine'
+    let data = [];                   // cache em memória (do Firestore)
+    let unsubscribe = null;          // listener do Firestore
 
     // ====== Login ======
+    const allowed = { wandersson: '2025', gislaine: '2025' };
+
     const loginView = document.getElementById('login-view');
     const appView = document.getElementById('app');
     const loginForm = document.getElementById('login-form');
+    const loginMsg = document.getElementById('login-msg');
 
     function showApp() {
       loginView.style.display = 'none';
@@ -470,28 +524,57 @@
       applyFilter();
     }
 
-    // Persist session
-    const existingSession = sessionStorage.getItem(SESSION_KEY);
-    if (existingSession === 'ok') showApp();
+    // restaura sessão
+    const previous = sessionStorage.getItem(SESSION_KEY);
+    if (previous) {
+      currentUser = previous;
+      attachRealtime();
+      showApp();
+    }
 
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const u = document.getElementById('user').value.trim().toLowerCase();
-      const p = document.getElementById('pass').value;
-      if (u === 'wandersson' && p === '2025') {
-        sessionStorage.setItem(SESSION_KEY, 'ok');
+      const p = document.getElementById('pass').value.trim();
+      if (allowed[u] && allowed[u] === p) {
+        currentUser = u;
+        sessionStorage.setItem(SESSION_KEY, u);
+        attachRealtime();
         showApp();
       } else {
-        alert('Usuário ou senha inválidos.');
+        loginMsg.style.visibility = 'visible';
       }
     });
 
     document.getElementById('btn-logout').addEventListener('click', () => {
       sessionStorage.removeItem(SESSION_KEY);
+      if (unsubscribe) unsubscribe();
+      currentUser = null;
       location.reload();
     });
 
-    // ====== Filtros (Mês/Ano) ======
+    // ====== Firestore: listener por usuário ======
+    async function attachRealtime() {
+      if (!currentUser) return;
+      if (unsubscribe) unsubscribe();
+
+      const qUser = query(collection(db, 'transacoes'), where('user', '==', currentUser));
+      unsubscribe = onSnapshot(qUser, (snap) => {
+        const arr = [];
+        snap.forEach(d => {
+          const v = d.data();
+          arr.push({ id: d.id, ...v });
+        });
+        // Ordena por data crescente (client-side)
+        data = arr.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        populateMonthYearSelectors(); // anos podem mudar conforme dados
+        applyFilter();
+      }, (err) => {
+        console.error('Firestore listener error:', err);
+      });
+    }
+
+    // ====== Filtros ======
     const monthSel = document.getElementById('filter-month');
     const yearSel = document.getElementById('filter-year');
 
@@ -502,24 +585,19 @@
       ];
       monthSel.innerHTML = months.map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
 
-      // Anos baseados nos dados + ano atual
-      const yearsInData = new Set(data.map(x => new Date(x.date).getFullYear()).filter(Boolean));
-      const currentYear = new Date().getFullYear();
-      yearsInData.add(currentYear);
+      const yearsInData = new Set(data.map(x => Number(String(x.date).slice(0, 4))).filter(Boolean));
+      const nowY = new Date().getFullYear(); yearsInData.add(nowY);
       const years = Array.from(yearsInData).sort((a, b) => a - b);
       yearSel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
 
-      // Seleciona mês/ano atuais
       const now = new Date();
-      monthSel.value = String(now.getMonth() + 1);
-      yearSel.value = String(now.getFullYear());
+      if (!monthSel.value) monthSel.value = String(now.getMonth() + 1);
+      if (!yearSel.value) yearSel.value = String(now.getFullYear());
     }
 
     document.getElementById('filters').addEventListener('submit', (e) => {
-      e.preventDefault();
-      applyFilter();
+      e.preventDefault(); applyFilter();
     });
-
     document.getElementById('btn-clear-filter').addEventListener('click', () => {
       const now = new Date();
       monthSel.value = String(now.getMonth() + 1);
@@ -531,46 +609,38 @@
     const form = document.getElementById('form');
     const tbody = document.getElementById('tbody');
 
-    form.addEventListener('submit', (e) => {
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+    const amountInput = document.getElementById('amount');
+    amountInput.addEventListener('blur', () => {
+      const n = parseBRL(amountInput.value);
+      if (!isNaN(n)) amountInput.value = brl(n);
+    });
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!currentUser) return alert('Você precisa estar logado.');
+
       const type = document.getElementById('type').value;
-      const date = document.getElementById('date').value; // yyyy-mm-dd
+      const date = document.getElementById('date').value;
       const amountRaw = document.getElementById('amount').value;
       const desc = document.getElementById('desc').value.trim();
       const category = document.getElementById('category').value.trim();
 
       if (!date) return alert('Informe a data');
-
       const amount = parseBRL(amountRaw);
       if (isNaN(amount)) return alert('Valor inválido');
 
-      const item = {
-        id: crypto.randomUUID(),
-        type, // 'income' | 'expense'
-        date, // ISO yyyy-mm-dd
-        amount, // number (centavos)
-        desc,
-        category
-      };
-
-      data.push(item);
-      save(data);
-      form.reset();
-      // mantém tipo selecionado e data de hoje
-      document.getElementById('type').value = type;
-      document.getElementById('date').value = new Date().toISOString().slice(0, 10);
-      applyFilter();
+      try {
+        await addDoc(collection(db, 'transacoes'), {
+          user: currentUser, type, date, amount, desc, category, createdAt: Date.now()
+        });
+        form.reset();
+        document.getElementById('type').value = type;
+        document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+      } catch (err) {
+        console.error(err); alert('Falha ao salvar no Firebase.');
+      }
     });
-
-    // Helper: converte texto BRL (1.234,56) para número em reais
-    function parseBRL(str) {
-      if (!str) return NaN;
-      const s = String(str).replace(/\./g, '').replace(',', '.').replace(/[^0-9.-]/g, '');
-      return Number(s);
-    }
-
-    // Formata número como BRL
-    function brl(n) { return fmt.format(n || 0); }
 
     // ====== Render + Filtro ======
     function applyFilter() {
@@ -578,9 +648,9 @@
       const y = Number(yearSel.value);
 
       const filtered = data.filter(x => {
-        const d = new Date(x.date + 'T00:00:00');
-        return d.getMonth() + 1 === m && d.getFullYear() === y;
-      }).sort((a, b) => a.date.localeCompare(b.date));
+        const d = new Date(String(x.date) + 'T00:00:00');
+        return (d.getMonth() + 1) === m && d.getFullYear() === y;
+      });
 
       renderTable(filtered);
       renderSummary(filtered);
@@ -603,7 +673,7 @@
         return;
       }
       tbody.innerHTML = list.map(row => {
-        const d = new Date(row.date + 'T00:00:00');
+        const d = new Date(String(row.date) + 'T00:00:00');
         const date = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
         const badge = row.type === 'income' ? '<span class="badge income">Ganho</span>' : '<span class="badge expense">Gasto</span>';
         return `
@@ -624,75 +694,65 @@
       }).join('');
     }
 
-    function escapeHtml(s) {
-      return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-    }
-
-    // Ações linha
-    tbody.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      const tr = e.target.closest('tr');
-      const id = tr?.dataset?.id;
-      const idx = data.findIndex(x => x.id === id);
-      if (idx === -1) return;
+    // Ações linha (Editar/Duplicar/Excluir)
+    tbody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      const tr = e.target.closest('tr'); const id = tr?.dataset?.id;
+      const item = data.find(x => x.id === id); if (!item) return;
 
       if (btn.dataset.action === 'del') {
         if (confirm('Excluir lançamento?')) {
-          data.splice(idx, 1);
-          save(data);
-          applyFilter();
+          try { await deleteDoc(doc(db, 'transacoes', id)); } catch (err) { console.error(err); alert('Erro ao excluir.'); }
         }
       }
       if (btn.dataset.action === 'dup') {
-        const copy = { ...data[idx], id: crypto.randomUUID() };
-        data.push(copy);
-        save(data);
-        applyFilter();
+        try {
+          await addDoc(collection(db, 'transacoes'), {
+            user: currentUser, type: item.type, date: item.date, amount: item.amount,
+            desc: item.desc, category: item.category, createdAt: Date.now()
+          });
+        } catch (err) { console.error(err); alert('Erro ao duplicar.'); }
       }
       if (btn.dataset.action === 'edit') {
-        const item = data[idx];
         const novadata = prompt('Data (AAAA-MM-DD):', item.date) || item.date;
         const novotipo = prompt('Tipo (income/expense):', item.type) || item.type;
-        const novadesc = prompt('Descrição:', item.desc) ?? item.desc;
-        const novacat = prompt('Categoria:', item.category) ?? item.category;
-        const novoval = prompt('Valor (use vírgula para centavos):', String(item.amount).replace('.', ','));
-        const num = novoval ? parseBRL(novoval) : item.amount;
+        const novadesc = prompt('Descrição:', item.desc ?? '') ?? item.desc;
+        const novacat = prompt('Categoria:', item.category ?? '') ?? item.category;
+        const novoval = prompt('Valor (use vírgula para centavos):', String(item.amount).replace('.', ',')) ?? String(item.amount);
+        const num = parseBRL(novoval);
         if (isNaN(num)) return alert('Valor inválido');
-        Object.assign(item, { date: novadata, type: novotipo, desc: novadesc, category: novacat, amount: num });
-        save(data);
-        applyFilter();
+        try {
+          await updateDoc(doc(db, 'transacoes', id), { date: novadata, type: novotipo, desc: novadesc, category: novacat, amount: num });
+        } catch (err) { console.error(err); alert('Erro ao editar.'); }
       }
     });
 
-    // ====== Import/Export ======
-    const exportBtn = document.getElementById('btn-export');
-    exportBtn.addEventListener('click', () => {
+    // ====== Import/Export JSON ======
+    document.getElementById('btn-export').addEventListener('click', () => {
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = 'planilha-ganhos-gastos.json';
+      a.href = url; a.download = `planilha-${currentUser || 'usuario'}.json`;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
     });
-
+    const importUIBtn = document.getElementById('btn-import-ui');
     const importBtn = document.getElementById('btn-import');
     const importFile = document.getElementById('import-file');
+    importUIBtn.addEventListener('click', () => importFile.click());
     importBtn.addEventListener('click', () => importFile.click());
     importFile.addEventListener('change', async () => {
-      const file = importFile.files?.[0];
-      if (!file) return;
+      const file = importFile.files?.[0]; if (!file) return;
       try {
         const text = await file.text();
         const json = JSON.parse(text);
         if (!Array.isArray(json)) throw new Error('Arquivo inválido');
-        // Opcional: valida campos mínimos
-        const ok = json.every(x => x && typeof x === 'object' && x.date && x.type && typeof x.amount === 'number');
-        if (!ok) throw new Error('Estrutura inválida');
-        data = json.map(x => ({ id: x.id || crypto.randomUUID(), ...x }));
-        save(data);
-        populateMonthYearSelectors();
-        applyFilter();
+        const batch = json.filter(x => x && typeof x === 'object' && x.date && x.type && typeof x.amount === 'number');
+        for (const x of batch) {
+          await addDoc(collection(db, 'transacoes'), {
+            user: currentUser, type: x.type, date: x.date, amount: x.amount, desc: x.desc || '', category: x.category || '', createdAt: Date.now()
+          });
+        }
         importFile.value = '';
         alert('Importado com sucesso!');
       } catch (err) {
@@ -700,28 +760,65 @@
       }
     });
 
-    // ====== Qualidade de Vida ======
-    // Preenche data de hoje no form e valor com máscara simples (BRL-like)
-    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+    // ====== PDF (Resumo + Tabela Completa do mês filtrado) ======
+    // jsPDF + autoTable via UMD
+    // (carregados no script não-módulo abaixo; aqui só usamos)
+    document.getElementById('btn-pdf').addEventListener('click', () => {
+      const m = Number(monthSel.value), y = Number(yearSel.value);
+      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const header = `Relatório Financeiro - ${monthNames[m - 1]}/${y} • Usuário: ${currentUser}`;
 
-    const amountInput = document.getElementById('amount');
-    amountInput.addEventListener('blur', () => {
-      const n = parseBRL(amountInput.value);
-      if (!isNaN(n)) amountInput.value = brl(n);
+      const filtered = data.filter(x => {
+        const d = new Date(String(x.date) + 'T00:00:00');
+        return (d.getMonth() + 1) === m && d.getFullYear() === y;
+      });
+
+      const incomes = filtered.filter(x => x.type === 'income').reduce((s, x) => s + x.amount, 0);
+      const expenses = filtered.filter(x => x.type === 'expense').reduce((s, x) => s + x.amount, 0);
+      const balance = incomes - expenses;
+
+      // @ts-ignore
+      const { jsPDF } = window.jspdf;
+      const docPDF = new jsPDF({ unit: 'pt', format: 'a4' });
+
+      docPDF.setFontSize(14);
+      docPDF.text(header, 40, 40);
+
+      docPDF.setFontSize(11);
+      docPDF.text(`Ganhos: ${brl(incomes)}   Gastos: ${brl(expenses)}   Saldo: ${brl(balance)}`, 40, 64);
+
+      const rows = filtered.map(x => {
+        const d = new Date(String(x.date) + 'T00:00:00');
+        const dia = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+        return [dia, x.type === 'income' ? 'Ganho' : 'Gasto', x.desc || '', x.category || '', brl(x.amount)];
+      });
+
+      // @ts-ignore
+      docPDF.autoTable({
+        head: [['Data', 'Tipo', 'Descrição', 'Categoria', 'Valor']],
+        body: rows,
+        startY: 80,
+        styles: { fontSize: 10, cellPadding: 6 },
+        headStyles: { fillColor: [22, 163, 74] } // verde
+      });
+
+      docPDF.save(`relatorio-${currentUser}-${y}-${String(m).padStart(2, '0')}.pdf`);
     });
 
-    // Enter para navegar entre campos
+    // ====== Inicializações qualitativas ======
+    // Enter navega campos
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
         const inputs = Array.from(form.querySelectorAll('input, select'));
         const i = inputs.indexOf(e.target);
-        if (i > -1 && i < inputs.length - 1) {
-          e.preventDefault();
-          inputs[i + 1].focus();
-        }
+        if (i > -1 && i < inputs.length - 1) { e.preventDefault(); inputs[i + 1].focus(); }
       }
     });
   </script>
+
+  <!-- jsPDF + autoTable (UMD, não-módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 </body>
 
 </html>
