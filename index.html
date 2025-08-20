@@ -267,9 +267,14 @@
       max-width: 440px
     }
 
-    @media (max-width: 360px){
-      .card.pad.login{ padding:12px }
-      .login h1{ font-size:20px }
+    @media (max-width: 360px) {
+      .card.pad.login {
+        padding: 12px
+      }
+
+      .login h1 {
+        font-size: 20px
+      }
     }
 
     .login h1 {
@@ -524,7 +529,7 @@
     const loginMsg = document.getElementById('login-msg');
 
     function showApp() {
-}
+    }
 
     function showLogin() {
       loginView.style.display = "block";
@@ -533,7 +538,7 @@
 
     // ====== (Auth) ======
     const auth = firebase.auth();
-// sessão via Firebase Auth
+    // sessão via Firebase Auth
     // Observa estado de autenticação e sincroniza UI + Firestore
     auth.onAuthStateChanged((user) => {
       if (user) {
