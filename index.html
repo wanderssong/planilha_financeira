@@ -325,13 +325,13 @@
         </div>
         <h1>Entrar na Planilha</h1>
       </div>
-      <p style="margin-top:-6px;color:var(--text-dim)">
-        Use seu usuário e senha para acessar. <br>
-        <small>Dica: <code>wandersson</code> / <code>Ano</code> ou <code>Gislaine</code> / <code>Ano</code></small>
+      <p style="margin-top:-6px;color:var(--text-dim)">Use seu <strong>e-mail</strong> e senha cadastrados no Firebase
+        para acessar.
+        <br><small>Ex.: <code>seuemail@exemplo.com</code> / <code>sua-senha</code></small>
       </p>
       <form id="login-form">
-        <label for="user">Usuário</label>
-        <input class="input" id="user" autocomplete="username" placeholder="Usuario" required>
+        <label for="user">E-mail</label>
+        <input class="input" id="user" autocomplete="username" placeholder="email@exemplo.com" required>
         <label for="pass">Senha</label>
         <input class="input" id="pass" type="password" autocomplete="current-password" placeholder="••••" required>
         <div style="display:flex;gap:8px;margin-top:14px;align-items:center;justify-content:space-between;">
@@ -470,6 +470,8 @@
 
   <!-- Firebase compat (garante funcionamento amplo em mobile e file://) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <!-- jsPDF + autoTable -->
@@ -511,48 +513,79 @@
     let unsubscribe = null;
 
     // ====== Login ======
-    const allowed = { wandersson: '2025', gislaine: '2025' };
     const loginView = document.getElementById('login-view');
     const appView = document.getElementById('app');
     const loginForm = document.getElementById('login-form');
     const loginMsg = document.getElementById('login-msg');
 
     function showApp() {
-      loginView.style.display = 'none';
-      appView.style.display = 'block';
+      loginView.style.display = "none";
+      appView.style.display = "block";
       populateMonthYearSelectors();
       applyFilter();
     }
 
-    // sessão
-    const previous = sessionStorage.getItem(SESSION_KEY);
-    if (previous) {
-      currentUser = previous;
-      attachRealtime();
-      showApp();
+    function showLogin() {
+      loginView.style.display = "block";
+      appView.style.display = "none";
     }
 
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const u = document.getElementById('user').value.trim().toLowerCase();
-      const p = document.getElementById('pass').value.trim();
-      if (allowed[u] && allowed[u] === p) {
-        currentUser = u;
-        sessionStorage.setItem(SESSION_KEY, u);
+    // ====== (Auth) ======
+    const auth = firebase.auth();
+
+    loginView.style.display = 'none';
+    appView.style.display = 'block';
+    populateMonthYearSelectors();
+    applyFilter();
+    
+
+
+    // sessão via Firebase Auth
+    // Observa estado de autenticação e sincroniza UI + Firestore
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUser = user.uid;
+        sessionStorage.setItem(SESSION_KEY, currentUser); // opcional
         attachRealtime();
         showApp();
       } else {
-        loginMsg.style.visibility = 'visible';
+        sessionStorage.removeItem(SESSION_KEY);
+        if (unsubscribe) unsubscribe();
+        currentUser = null;
+        showLogin();
       }
     });
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
+    // Login com email/senha
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('user').value.trim();
+      const pass = document.getElementById('pass').value.trim();
+      const submitBtn = loginForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      const prevText = submitBtn.textContent;
+      submitBtn.textContent = 'Entrando...';
+      loginMsg.style.visibility = 'hidden';
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        // onAuthStateChanged cuidará do resto
+      } catch (err) {
+        console.error(err);
+        loginMsg.style.visibility = 'visible';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = prevText;
+      }
+    });
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      try { await auth.signOut(); } catch (e) { }
       sessionStorage.removeItem(SESSION_KEY);
       if (unsubscribe) unsubscribe();
       currentUser = null;
-      location.reload();
+      showLogin();
     });
-
     // ====== Firestore: listener por usuário ======
     async function attachRealtime() {
       if (!currentUser) return;
