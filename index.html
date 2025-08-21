@@ -267,16 +267,6 @@
       max-width: 440px
     }
 
-    @media (max-width: 360px) {
-      .card.pad.login {
-        padding: 12px
-      }
-
-      .login h1 {
-        font-size: 20px
-      }
-    }
-
     .login h1 {
       margin: 0 0 14px
     }
@@ -335,13 +325,13 @@
         </div>
         <h1>Entrar na Planilha</h1>
       </div>
-      <p style="margin-top:-6px;color:var(--text-dim)">Use seu <strong>e-mail</strong> e senha cadastrados no Firebase
-        para acessar.
-        <br><small>Ex.: <code>seuemail@exemplo.com</code> / <code>sua-senha</code></small>
+      <p style="margin-top:-6px;color:var(--text-dim)">
+        Use seu usuário e senha para acessar. <br>
+        <small>Dica: <code>wandersson</code> / <code>2025</code> ou <code>gislaine</code> / <code>2025</code></small>
       </p>
       <form id="login-form">
-        <label for="user">E-mail</label>
-        <input class="input" id="user" autocomplete="username" placeholder="email@exemplo.com" required>
+        <label for="user">Usuário</label>
+        <input class="input" id="user" autocomplete="username" placeholder="Usuario" required>
         <label for="pass">Senha</label>
         <input class="input" id="pass" type="password" autocomplete="current-password" placeholder="••••" required>
         <div style="display:flex;gap:8px;margin-top:14px;align-items:center;justify-content:space-between;">
@@ -480,8 +470,6 @@
 
   <!-- Firebase compat (garante funcionamento amplo em mobile e file://) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <!-- jsPDF + autoTable -->
@@ -523,67 +511,48 @@
     let unsubscribe = null;
 
     // ====== Login ======
+    const allowed = { wandersson: '2025', gislaine: '2025' };
     const loginView = document.getElementById('login-view');
     const appView = document.getElementById('app');
     const loginForm = document.getElementById('login-form');
     const loginMsg = document.getElementById('login-msg');
 
     function showApp() {
+      loginView.style.display = 'none';
+      appView.style.display = 'block';
+      populateMonthYearSelectors();
+      applyFilter();
     }
 
-    function showLogin() {
-      loginView.style.display = "block";
-      appView.style.display = "none";
+    // sessão
+    const previous = sessionStorage.getItem(SESSION_KEY);
+    if (previous) {
+      currentUser = previous;
+      attachRealtime();
+      showApp();
     }
 
-    // ====== (Auth) ======
-    const auth = firebase.auth();
-    // sessão via Firebase Auth
-    // Observa estado de autenticação e sincroniza UI + Firestore
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user.uid;
-        sessionStorage.setItem(SESSION_KEY, currentUser); // opcional
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const u = document.getElementById('user').value.trim().toLowerCase();
+      const p = document.getElementById('pass').value.trim();
+      if (allowed[u] && allowed[u] === p) {
+        currentUser = u;
+        sessionStorage.setItem(SESSION_KEY, u);
         attachRealtime();
         showApp();
       } else {
-        sessionStorage.removeItem(SESSION_KEY);
-        if (unsubscribe) unsubscribe();
-        currentUser = null;
-        showLogin();
-      }
-    });
-
-    // Login com email/senha
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('user').value.trim();
-      const pass = document.getElementById('pass').value.trim();
-      const submitBtn = loginForm.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      const prevText = submitBtn.textContent;
-      submitBtn.textContent = 'Entrando...';
-      loginMsg.style.visibility = 'hidden';
-      try {
-        await auth.signInWithEmailAndPassword(email, pass);
-        // onAuthStateChanged cuidará do resto
-      } catch (err) {
-        console.error(err);
         loginMsg.style.visibility = 'visible';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = prevText;
       }
     });
 
-    // Logout
-    document.getElementById('btn-logout').addEventListener('click', async () => {
-      try { await auth.signOut(); } catch (e) { }
+    document.getElementById('btn-logout').addEventListener('click', () => {
       sessionStorage.removeItem(SESSION_KEY);
       if (unsubscribe) unsubscribe();
       currentUser = null;
-      showLogin();
+      location.reload();
     });
+
     // ====== Firestore: listener por usuário ======
     async function attachRealtime() {
       if (!currentUser) return;
