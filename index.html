@@ -312,6 +312,15 @@
         font-size: 20px
       }
     }
+
+    /* Garantir estado inicial */
+    #app {
+      display: none !important
+    }
+
+    #login {
+      display: block !important
+    }
   </style>
 </head>
 
@@ -469,7 +478,12 @@
   </section>
 
   <!-- Firebase compat (garante funcionamento amplo em mobile e file://) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js">
+    // Forçar estado inicial: sempre mostrar login ao carregar
+    document.addEventListener('DOMContentLoaded', function () {
+      try { if (typeof showLogin === 'function') { showLogin(); } } catch (_) { }
+    });
+  </script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <!-- jsPDF + autoTable -->
@@ -528,8 +542,7 @@
     const previous = sessionStorage.getItem(SESSION_KEY);
     if (previous) {
       currentUser = previous;
-      attachRealtime();
-      showApp();
+      // attachRealtime only after login
     }
 
     loginForm.addEventListener('submit', (e) => {
@@ -539,8 +552,7 @@
       if (allowed[u] && allowed[u] === p) {
         currentUser = u;
         sessionStorage.setItem(SESSION_KEY, u);
-        attachRealtime();
-        showApp();
+        // attachRealtime only after login
       } else {
         loginMsg.style.visibility = 'visible';
       }
